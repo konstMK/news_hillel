@@ -1,0 +1,33 @@
+version: "2"
+
+services:
+  php:
+    image: grolse/php:latest
+    volumes:
+      - ".:/var/www/app"
+    container_name: news
+    links:
+      - mariadb
+  nginx:
+    image: grolse/nginx-symfony:latest
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes_from:
+      - php
+    links:
+      - php
+    container_name: news_nginx
+  mariadb:
+    container_name: news_sql
+    image: 'bitnami/mariadb:latest'
+    ports:
+      - '3306:3306'
+    volumes:
+    - 'mariadb_data:/bitnami'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_DATABASE=news
+volumes:
+  mariadb_data:
+    driver: local
